@@ -844,161 +844,219 @@ footer {
   </div>
 </section>
 
-<!-- FLOATING CHATBOT WIDGET -->
-<div id="chatBubble" style="position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.25); z-index: 9999; transition: transform 0.2s ease;">
-  <span id="chatBubbleIcon" style="font-size: 26px;">💬</span>
-  <span id="chatBubbleBadge" style="position: absolute; top: -4px; right: -4px; width: 18px; height: 18px; background: #e0483e; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 11px; color: white; font-weight: 700;">1</span>
+<!-- =========================================================
+     AM777 FUNNEL-BOT SNIPPET — self-contained, drop-in anywhere
+     Namespaced ids/classes (am777chat-*) so it never collides
+     with host page CSS/JS. Copy this whole block into any
+     AM777 funnel page (Payhip, other landers) to reuse as-is.
+     ========================================================== -->
+<div id="am777chat-bubble" style="position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.25); z-index: 9999; transition: transform 0.15s ease;">
+  <span style="font-size: 26px;">💬</span>
+  <span id="am777chat-badge" style="position: absolute; top: -4px; right: -4px; width: 18px; height: 18px; background: #e0483e; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 11px; color: white; font-weight: 700;">1</span>
 </div>
 
-<div id="chatWindow" style="position: fixed; bottom: 96px; right: 24px; width: 340px; max-width: calc(100vw - 32px); background: var(--white); border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.25); z-index: 9999; display: none; flex-direction: column; overflow: hidden;">
-  <div style="background: var(--black); color: var(--white); padding: 14px 16px; display: flex; justify-content: space-between; align-items: center;">
-    <div>
-      <div style="font-size: 14px; font-weight: 600;">Alecs · AM777</div>
-      <div style="font-size: 11px; color: var(--gold);">Usually replies in minutes</div>
+<div id="am777chat-window" style="position: fixed; bottom: 96px; right: 24px; width: 340px; max-width: calc(100vw - 32px); background: var(--white); border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.25); z-index: 9999; display: none; flex-direction: column; overflow: hidden;">
+  <div style="background: var(--black); color: var(--white); padding: 14px 16px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-size: 14px; font-weight: 600;">Alecs · AM777</div>
+        <div style="font-size: 11px; color: var(--gold);">Usually replies in minutes</div>
+      </div>
+      <span id="am777chat-close" style="cursor: pointer; font-size: 18px; line-height: 1;">&times;</span>
     </div>
-    <span id="chatClose" style="cursor: pointer; font-size: 18px; line-height: 1;">&times;</span>
+    <div style="margin-top: 10px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden;">
+      <div id="am777chat-progress" style="height: 100%; width: 0%; background: var(--gold); transition: width 0.3s ease;"></div>
+    </div>
   </div>
 
-  <div id="chatMessages" style="height: 320px; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: var(--gray-soft);"></div>
+  <div id="am777chat-messages" style="height: 320px; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: var(--gray-soft);"></div>
 
-  <div style="display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--gray-border); background: var(--white);">
-    <input type="text" id="chatInput" placeholder="Type your answer..." style="flex: 1; padding: 10px; border: 1px solid var(--gray-border); border-radius: 6px; font-size: 13px;">
-    <button id="chatSend" style="padding: 10px 16px; background: var(--gold); color: var(--black); border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">Send</button>
+  <div id="am777chat-inputRow" style="display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--gray-border); background: var(--white);">
+    <input type="text" id="am777chat-input" placeholder="Type your answer..." style="flex: 1; padding: 10px; border: 1px solid var(--gray-border); border-radius: 6px; font-size: 13px;">
+    <button id="am777chat-send" style="padding: 10px 16px; background: var(--gold); color: var(--black); border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">Send</button>
   </div>
 </div>
 
 <script>
-// Chatbot Logic with Lead Qualification
-const chatbot = {
-  stage: 0,
-  data: {},
-  questions: [
+(function () {
+  // --- Funnel definition: each step routes the lead closer to a booked call ---
+  var STEPS = [
     { key: 'name', prompt: "What's your name?", type: 'text' },
     { key: 'email', prompt: "What's your email?", type: 'email' },
     { key: 'business', prompt: "What's your business or role? (e.g., E-commerce owner, VA, Agency)", type: 'text' },
     { key: 'budget', prompt: "Budget for automation setup?", type: 'choice', options: ['₱5K-15K', '₱15K-30K', '₱30K+', 'Not sure yet'] },
-    { key: 'timeline', prompt: "Timeline?", type: 'choice', options: ['ASAP (within 1-5 days)', '1-2 weeks', 'Flexible'] }
-  ],
+    { key: 'timeline', prompt: "Timeline?", type: 'choice', options: ['ASAP (1-5 days)', '1-2 weeks', 'Flexible'] }
+  ];
+  var CALENDLY_URL = 'https://calendly.com/damazonbusiness111/30min';
+  var ZAPIER_WEBHOOK = 'https://hooks.zapier.com/hooks/catch/YOUR_ZAPIER_WEBHOOK_ID/'; // TODO: replace with your real webhook
 
-  started: false,
+  var bubble = document.getElementById('am777chat-bubble');
+  var win = document.getElementById('am777chat-window');
+  var badge = document.getElementById('am777chat-badge');
+  var closeBtn = document.getElementById('am777chat-close');
+  var messages = document.getElementById('am777chat-messages');
+  var input = document.getElementById('am777chat-input');
+  var sendBtn = document.getElementById('am777chat-send');
+  var progressBar = document.getElementById('am777chat-progress');
 
-  init() {
-    document.getElementById('chatSend').onclick = () => this.handleInput();
-    document.getElementById('chatInput').onkeypress = (e) => e.key === 'Enter' && this.handleInput();
+  var state = { stage: 0, data: {}, started: false, awaitingRetry: false };
 
-    const bubble = document.getElementById('chatBubble');
-    const win = document.getElementById('chatWindow');
-    const badge = document.getElementById('chatBubbleBadge');
-    const closeBtn = document.getElementById('chatClose');
-
-    const openChat = () => {
-      win.style.display = 'flex';
-      badge.style.display = 'none';
-      if (!this.started) {
-        this.started = true;
-        this.addMessage("👋 Hey! I'm Alecs from AM777. Quick question:", 'bot');
-        setTimeout(() => this.askQuestion(), 500);
-      }
-    };
-
-    const closeChat = () => {
-      win.style.display = 'none';
-    };
-
-    bubble.onclick = () => {
-      win.style.display === 'flex' ? closeChat() : openChat();
-    };
-    closeBtn.onclick = (e) => { e.stopPropagation(); closeChat(); };
-
-    // Auto-popup 10 seconds after landing
-    setTimeout(() => {
-      if (win.style.display !== 'flex') {
-        badge.style.display = 'flex';
-        openChat();
-      }
-    }, 10000);
-  },
-
-  handleInput() {
-    const input = document.getElementById('chatInput').value.trim();
-    if (!input) return;
-
-    this.addMessage(input, 'user');
-    document.getElementById('chatInput').value = '';
-
-    if (this.stage < this.questions.length) {
-      const q = this.questions[this.stage];
-      this.data[q.key] = input;
-      this.stage++;
-
-      if (this.stage < this.questions.length) {
-        setTimeout(() => this.askQuestion(), 600);
-      } else {
-        setTimeout(() => this.qualify(), 800);
-      }
+  function openChat() {
+    win.style.display = 'flex';
+    badge.style.display = 'none';
+    if (!state.started) {
+      state.started = true;
+      addMessage("👋 Hey! I'm Alecs from AM777. A couple quick questions so I can point you the right way — takes 30 seconds.", 'bot');
+      setTimeout(askStep, 500);
     }
-  },
+  }
 
-  askQuestion() {
-    const q = this.questions[this.stage];
-    if (q.type === 'choice') {
-      let opts = q.options.map(o => `<button style="display: block; width: 100%; margin: 6px 0; padding: 10px; background: var(--white); border: 1px solid var(--gold); color: var(--black); border-radius: 6px; cursor: pointer; font-size: 13px;" onclick="chatbot.handleInput(); document.getElementById('chatInput').value='${o}';">${o}</button>`).join('');
-      this.addMessage(`<strong>${q.prompt}</strong><div style="margin-top: 10px;">${opts}</div>`, 'bot', true);
+  function closeChat() {
+    win.style.display = 'none';
+  }
+
+  bubble.addEventListener('click', function () {
+    win.style.display === 'flex' ? closeChat() : openChat();
+  });
+  closeBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    closeChat();
+  });
+
+  // Auto-popup once, 10s after landing, if the visitor hasn't opened it already
+  setTimeout(function () {
+    if (win.style.display !== 'flex') {
+      badge.style.display = 'flex';
+      openChat();
+    }
+  }, 10000);
+
+  function updateProgress() {
+    var pct = Math.min(100, Math.round((state.stage / STEPS.length) * 100));
+    progressBar.style.width = pct + '%';
+  }
+
+  function addMessage(html, sender) {
+    var msg = document.createElement('div');
+    msg.style.cssText = sender === 'bot'
+      ? 'background: var(--white); padding: 12px; border-radius: 8px; border-left: 3px solid var(--gold); font-size: 13px; line-height: 1.5;'
+      : 'background: var(--gold); color: var(--black); padding: 12px; border-radius: 8px; margin-left: 40px; text-align: right; font-size: 13px;';
+    msg.innerHTML = html;
+    messages.appendChild(msg);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function isValidEmail(str) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str);
+  }
+
+  function askStep() {
+    updateProgress();
+    if (state.stage >= STEPS.length) { qualify(); return; }
+    var step = STEPS[state.stage];
+
+    if (step.type === 'choice') {
+      input.style.display = 'none';
+      sendBtn.style.display = 'none';
+      var wrap = document.createElement('div');
+      wrap.style.cssText = 'background: var(--white); padding: 12px; border-radius: 8px; border-left: 3px solid var(--gold); font-size: 13px;';
+      var label = document.createElement('div');
+      label.style.fontWeight = '600';
+      label.textContent = step.prompt;
+      wrap.appendChild(label);
+
+      var optRow = document.createElement('div');
+      optRow.style.marginTop = '10px';
+      step.options.forEach(function (opt) {
+        var btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.style.cssText = 'display: block; width: 100%; margin: 6px 0; padding: 10px; background: var(--white); border: 1px solid var(--gold); color: var(--black); border-radius: 6px; cursor: pointer; font-size: 13px; text-align: left;';
+        btn.addEventListener('click', function () {
+          Array.prototype.forEach.call(optRow.children, function (b) { b.disabled = true; b.style.opacity = '0.5'; });
+          submitAnswer(opt);
+        });
+        optRow.appendChild(btn);
+      });
+      wrap.appendChild(optRow);
+      messages.appendChild(wrap);
+      messages.scrollTop = messages.scrollHeight;
     } else {
-      this.addMessage(`<strong>${q.prompt}</strong>`, 'bot', true);
+      input.style.display = '';
+      sendBtn.style.display = '';
+      input.type = step.type === 'email' ? 'email' : 'text';
+      input.focus();
+      addMessage('<strong>' + escapeHtml(step.prompt) + '</strong>', 'bot');
     }
-  },
+  }
 
-  qualify() {
-    const budget = this.data.budget || '';
-    const timeline = this.data.timeline || '';
-    let tier = 'medium';
+  function submitAnswer(rawValue) {
+    var value = (rawValue !== undefined ? rawValue : input.value).trim();
+    if (!value) return;
 
-    if (budget.includes('30K') || budget.includes('Not sure')) tier = 'high';
-    if (budget.includes('5K')) tier = 'low';
+    var step = STEPS[state.stage];
 
-    this.sendToZapier(tier);
+    if (step.key === 'email' && !isValidEmail(value)) {
+      addMessage(escapeHtml(value), 'user');
+      input.value = '';
+      addMessage("That doesn't look like a valid email — mind double-checking it?", 'bot');
+      return;
+    }
+
+    addMessage(escapeHtml(value), 'user');
+    input.value = '';
+    state.data[step.key] = value;
+    state.stage++;
+
+    setTimeout(askStep, 500);
+  }
+
+  sendBtn.addEventListener('click', function () { submitAnswer(); });
+  input.addEventListener('keypress', function (e) { if (e.key === 'Enter') submitAnswer(); });
+
+  function qualify() {
+    input.style.display = 'none';
+    sendBtn.style.display = 'none';
+
+    var budget = state.data.budget || '';
+    var tier = 'medium';
+    if (budget.indexOf('30K') !== -1 || budget.indexOf('Not sure') !== -1) tier = 'high';
+    if (budget.indexOf('5K-15K') !== -1) tier = 'low';
+
+    sendToZapier(tier);
+
+    var name = escapeHtml(state.data.name || 'there');
+    var bookBtn = '<a href="' + CALENDLY_URL + '" target="_blank" rel="noopener" style="display: inline-block; margin-top: 10px; padding: 12px 20px; background: var(--gold); color: var(--black); border-radius: 6px; text-decoration: none; font-weight: 600;">📅 Book Free 15-Min Call</a>';
 
     if (tier === 'high') {
-      this.addMessage(`<strong>Perfect, ${this.data.name}! 🎉</strong><br>You're a great fit. Let's book your strategy call:<br><a href="https://calendly.com/damazonbusiness111/30min" target="_blank" style="display: inline-block; margin-top: 10px; padding: 12px 20px; background: var(--gold); color: var(--black); border-radius: 6px; text-decoration: none; font-weight: 600;">📅 Book Free 15-Min Call</a>`, 'bot', true);
+      addMessage('<strong>Perfect, ' + name + '! 🎉</strong><br>You\'re a great fit for Done-For-You. Let\'s book your strategy call:<br>' + bookBtn, 'bot');
     } else if (tier === 'medium') {
-      this.addMessage(`<strong>Thanks, ${this.data.name}!</strong><br>You're a fit for our Done-For-You service. Check out the details above or book a quick call:<br><a href="https://calendly.com/damazonbusiness111/30min" target="_blank" style="display: inline-block; margin-top: 10px; padding: 12px 20px; background: var(--gold); color: var(--black); border-radius: 6px; text-decoration: none; font-weight: 600;">📅 Book a Call</a>`, 'bot', true);
+      addMessage('<strong>Thanks, ' + name + '!</strong><br>You\'re a fit for our Done-For-You service. Book a quick call and we\'ll map it out:<br>' + bookBtn, 'bot');
     } else {
-      this.addMessage(`<strong>Thanks, ${this.data.name}!</strong><br>Start with our DIY kit (₱2K-3.5K) and upgrade later. We'll reach out with options!`, 'bot', true);
+      addMessage('<strong>Thanks, ' + name + '!</strong><br>Start with our DIY kit (₱2K-3.5K) and upgrade anytime. We\'ll follow up by email with options.', 'bot');
     }
-  },
-
-  addMessage(text, sender, isHtml = false) {
-    const msg = document.createElement('div');
-    msg.style.cssText = sender === 'bot'
-      ? 'background: var(--white); padding: 12px; border-radius: 8px; border-left: 3px solid var(--gold);'
-      : 'background: var(--gold); color: var(--black); padding: 12px; border-radius: 8px; margin-left: 40px; text-align: right;';
-    if (isHtml) msg.innerHTML = text;
-    else msg.textContent = text;
-    document.getElementById('chatMessages').appendChild(msg);
-    document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
-  },
-
-  sendToZapier(tier) {
-    const payload = {
-      name: this.data.name,
-      email: this.data.email,
-      business: this.data.business,
-      budget: this.data.budget,
-      timeline: this.data.timeline,
-      tier: tier,
-      timestamp: new Date().toLocaleString()
-    };
-
-    // Replace with your Zapier webhook URL
-    fetch('https://hooks.zapier.com/hooks/catch/YOUR_ZAPIER_WEBHOOK_ID/', {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    }).catch(e => console.log('Lead captured:', payload));
   }
-};
 
-chatbot.init();
+  function sendToZapier(tier) {
+    var payload = {
+      name: state.data.name,
+      email: state.data.email,
+      business: state.data.business,
+      budget: state.data.budget,
+      timeline: state.data.timeline,
+      tier: tier,
+      source: 'done-for-you-landing',
+      timestamp: new Date().toISOString()
+    };
+    fetch(ZAPIER_WEBHOOK, { method: 'POST', body: JSON.stringify(payload) })
+      .catch(function () { console.log('Lead captured (webhook not configured yet):', payload); });
+  }
+})();
 </script>
 
 <footer>

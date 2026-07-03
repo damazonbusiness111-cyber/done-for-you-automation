@@ -833,30 +833,39 @@ footer {
   </div>
 </section>
 
-<!-- CHATBOT CTA -->
+<!-- CTA (static fallback) -->
 <section class="cta-section">
   <div class="container">
-    <h2 style="font-size: 24px; margin-bottom: 32px;">Let's Find Your Fit (30 Seconds)</h2>
-
-    <!-- Chatbot Container -->
-    <div id="chatbot" style="max-width: 500px; margin: 0 auto; background: var(--gray-soft); border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-      <div id="chatMessages" style="min-height: 200px; max-height: 400px; overflow-y: auto; margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px;">
-        <div style="background: var(--white); padding: 12px; border-radius: 8px; border-left: 3px solid var(--gold);">
-          <p style="font-size: 14px; color: var(--black);">👋 Hey! I'm Alecs from AM777. Quick question: what's your name?</p>
-        </div>
-      </div>
-
-      <div style="display: flex; gap: 8px;">
-        <input type="text" id="chatInput" placeholder="Type your answer..." style="flex: 1; padding: 12px; border: 1px solid var(--gray-border); border-radius: 6px; font-size: 14px;">
-        <button id="chatSend" style="padding: 12px 20px; background: var(--gold); color: var(--black); border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">Send</button>
-      </div>
-    </div>
-
-    <p style="text-align: center; font-size: 12px; color: var(--gray-mid); margin-top: 16px;">
-      <strong>WhatsApp:</strong> +639608614037 | <strong>Email:</strong> damazonbusiness111@gmail.com
+    <h2 style="font-size: 24px; margin-bottom: 20px;">Ready to Get Your Hours Back?</h2>
+    <p class="cta-subtext">Chat with us below, or reach out directly:</p>
+    <p class="whatsapp-text">
+      <strong>WhatsApp:</strong> +639608614037 &nbsp;|&nbsp; <strong>Email:</strong> damazonbusiness111@gmail.com
     </p>
   </div>
 </section>
+
+<!-- FLOATING CHATBOT WIDGET -->
+<div id="chatBubble" style="position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.25); z-index: 9999; transition: transform 0.2s ease;">
+  <span id="chatBubbleIcon" style="font-size: 26px;">💬</span>
+  <span id="chatBubbleBadge" style="position: absolute; top: -4px; right: -4px; width: 18px; height: 18px; background: #e0483e; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 11px; color: white; font-weight: 700;">1</span>
+</div>
+
+<div id="chatWindow" style="position: fixed; bottom: 96px; right: 24px; width: 340px; max-width: calc(100vw - 32px); background: var(--white); border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.25); z-index: 9999; display: none; flex-direction: column; overflow: hidden;">
+  <div style="background: var(--black); color: var(--white); padding: 14px 16px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <div style="font-size: 14px; font-weight: 600;">Alecs · AM777</div>
+      <div style="font-size: 11px; color: var(--gold);">Usually replies in minutes</div>
+    </div>
+    <span id="chatClose" style="cursor: pointer; font-size: 18px; line-height: 1;">&times;</span>
+  </div>
+
+  <div id="chatMessages" style="height: 320px; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: var(--gray-soft);"></div>
+
+  <div style="display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--gray-border); background: var(--white);">
+    <input type="text" id="chatInput" placeholder="Type your answer..." style="flex: 1; padding: 10px; border: 1px solid var(--gray-border); border-radius: 6px; font-size: 13px;">
+    <button id="chatSend" style="padding: 10px 16px; background: var(--gold); color: var(--black); border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">Send</button>
+  </div>
+</div>
 
 <script>
 // Chatbot Logic with Lead Qualification
@@ -871,9 +880,43 @@ const chatbot = {
     { key: 'timeline', prompt: "Timeline?", type: 'choice', options: ['ASAP (within 1-5 days)', '1-2 weeks', 'Flexible'] }
   ],
 
+  started: false,
+
   init() {
     document.getElementById('chatSend').onclick = () => this.handleInput();
     document.getElementById('chatInput').onkeypress = (e) => e.key === 'Enter' && this.handleInput();
+
+    const bubble = document.getElementById('chatBubble');
+    const win = document.getElementById('chatWindow');
+    const badge = document.getElementById('chatBubbleBadge');
+    const closeBtn = document.getElementById('chatClose');
+
+    const openChat = () => {
+      win.style.display = 'flex';
+      badge.style.display = 'none';
+      if (!this.started) {
+        this.started = true;
+        this.addMessage("👋 Hey! I'm Alecs from AM777. Quick question:", 'bot');
+        setTimeout(() => this.askQuestion(), 500);
+      }
+    };
+
+    const closeChat = () => {
+      win.style.display = 'none';
+    };
+
+    bubble.onclick = () => {
+      win.style.display === 'flex' ? closeChat() : openChat();
+    };
+    closeBtn.onclick = (e) => { e.stopPropagation(); closeChat(); };
+
+    // Auto-popup 10 seconds after landing
+    setTimeout(() => {
+      if (win.style.display !== 'flex') {
+        badge.style.display = 'flex';
+        openChat();
+      }
+    }, 10000);
   },
 
   handleInput() {
@@ -902,7 +945,7 @@ const chatbot = {
       let opts = q.options.map(o => `<button style="display: block; width: 100%; margin: 6px 0; padding: 10px; background: var(--white); border: 1px solid var(--gold); color: var(--black); border-radius: 6px; cursor: pointer; font-size: 13px;" onclick="chatbot.handleInput(); document.getElementById('chatInput').value='${o}';">${o}</button>`).join('');
       this.addMessage(`<strong>${q.prompt}</strong><div style="margin-top: 10px;">${opts}</div>`, 'bot', true);
     } else {
-      this.addMessage(`<strong>${q.prompt}</strong>`, 'bot');
+      this.addMessage(`<strong>${q.prompt}</strong>`, 'bot', true);
     }
   },
 
@@ -956,7 +999,6 @@ const chatbot = {
 };
 
 chatbot.init();
-chatbot.askQuestion();
 </script>
 
 <footer>

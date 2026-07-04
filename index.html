@@ -186,6 +186,20 @@
     border-bottom: 1px solid var(--gold); padding-bottom: 2px;
   }
 
+  /* ══════════ CURRENCY SWITCH ══════════ */
+  .currency-switch {
+    display: flex; justify-content: center; gap: 6px; margin-bottom: 22px;
+  }
+  .curr-btn {
+    padding: 7px 18px; font-family: 'Space Grotesk', sans-serif; font-size: 11px;
+    letter-spacing: 1.5px; text-transform: uppercase; font-weight: 500;
+    background: var(--paper); color: var(--muted); border: 1px solid var(--line);
+    border-radius: 100px; cursor: pointer; transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
+  }
+  .curr-btn:hover:not(.active) { border-color: var(--gold); color: var(--gold-deep); }
+  .curr-btn.active { background: var(--graphite); color: #fff; border-color: var(--graphite); }
+  .curr-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
   /* ══════════ MAIN TABS ══════════ */
   .tabs-nav {
     display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
@@ -256,6 +270,12 @@
   }
   .step-chip .s-num { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold-deep); font-weight: 600; margin-bottom: 6px; }
   .step-chip .s-text { font-size: 13px; color: var(--ink); }
+
+  /* ══════════ EXPANDABLE DETAILS ══════════ */
+  .sub-details { outline: none; }
+  .sub-details summary::-webkit-details-marker { display: none; }
+  .sub-details summary::before { content: "+"; display: inline-block; width: 16px; }
+  .sub-details[open] summary::before { content: "−"; }
 
   /* ══════════ SUBSCRIPTION CARDS ══════════ */
   .sub-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
@@ -557,6 +577,11 @@
 <section class="section" id="tabs">
   <div class="container">
 
+    <div class="currency-switch" role="group" aria-label="Currency">
+      <button type="button" class="curr-btn" data-currency="php">₱ PHP</button>
+      <button type="button" class="curr-btn" data-currency="usd">$ USD</button>
+    </div>
+
     <div class="tabs-nav" role="tablist">
       <button class="tab-btn active" data-tab-btn="store" onclick="openTab('store', this)">Store</button>
       <button class="tab-btn" data-tab-btn="dfy" onclick="openTab('dfy', this)">DFY Setup</button>
@@ -587,7 +612,7 @@
             <span class="p-label">Includes</span>
             <span class="p-value">CRM dashboard, client records, pipeline stages, notes & activity tracking, setup guide</span>
           </div>
-          <div class="p-price">₱—<small> · one-time</small></div>
+          <div class="p-price" data-php="₱2,500" data-usd="$43"><span class="price-amount">₱2,500</span><small> · one-time</small></div>
           <div class="p-actions">
             <a class="btn btn-dark btn-sm" href="#payhip-link"><span>Buy Template</span></a>
             <a class="btn btn-gold-line btn-sm" href="#request-setup">Request DFY Setup</a>
@@ -608,7 +633,7 @@
             <span class="p-label">Includes</span>
             <span class="p-value">Invoice log, payment status tracking, due-date visibility, reminder framework, setup guide</span>
           </div>
-          <div class="p-price">₱—<small> · one-time</small></div>
+          <div class="p-price" data-php="₱1,800" data-usd="$31"><span class="price-amount">₱1,800</span><small> · one-time</small></div>
           <div class="p-actions">
             <a class="btn btn-dark btn-sm" href="#payhip-link"><span>Buy Template</span></a>
             <a class="btn btn-gold-line btn-sm" href="#request-setup">Request DFY Setup</a>
@@ -629,7 +654,7 @@
             <span class="p-label">Includes</span>
             <span class="p-value">Proposal structure, reusable pricing blocks, scope sections, ready-to-send format, setup guide</span>
           </div>
-          <div class="p-price">₱—<small> · one-time</small></div>
+          <div class="p-price" data-php="₱1,800" data-usd="$31"><span class="price-amount">₱1,800</span><small> · one-time</small></div>
           <div class="p-actions">
             <a class="btn btn-dark btn-sm" href="#payhip-link"><span>Buy Template</span></a>
             <a class="btn btn-gold-line btn-sm" href="#request-setup">Request DFY Setup</a>
@@ -650,7 +675,7 @@
             <span class="p-label">Includes</span>
             <span class="p-value">Step-by-step onboarding checklist, welcome flow, task templates, handover structure, setup guide</span>
           </div>
-          <div class="p-price">₱—<small> · one-time</small></div>
+          <div class="p-price" data-php="₱1,500" data-usd="$26"><span class="price-amount">₱1,500</span><small> · one-time</small></div>
           <div class="p-actions">
             <a class="btn btn-dark btn-sm" href="#payhip-link"><span>Buy Template</span></a>
             <a class="btn btn-gold-line btn-sm" href="#request-setup">Request DFY Setup</a>
@@ -671,7 +696,28 @@
             <span class="p-label">Includes</span>
             <span class="p-value">Lead log, follow-up schedule, status stages, next-action visibility, setup guide</span>
           </div>
-          <div class="p-price">₱—<small> · one-time</small></div>
+          <div class="p-price" data-php="₱2,000" data-usd="$34"><span class="price-amount">₱2,000</span><small> · one-time</small></div>
+          <div class="p-actions">
+            <a class="btn btn-dark btn-sm" href="#payhip-link"><span>Buy Template</span></a>
+            <a class="btn btn-gold-line btn-sm" href="#request-setup">Request DFY Setup</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <h3>Lead Generation Funnel Pro</h3>
+          <div class="p-row">
+            <span class="p-label">Best For</span>
+            <span class="p-value dark">Businesses with website traffic but no system turning visitors into qualified leads</span>
+          </div>
+          <div class="p-row">
+            <span class="p-label">Problem Solved</span>
+            <span class="p-value">Visitors leave without being captured — no way to know who's interested or how ready they are to buy</span>
+          </div>
+          <div class="p-row">
+            <span class="p-label">Includes</span>
+            <span class="p-value">Embeddable qualifying chatbot, lead-scoring logic, webhook integration to your CRM/Sheet, auto-booking for hot leads, setup guide</span>
+          </div>
+          <div class="p-price" data-php="₱2,850" data-usd="$49"><span class="price-amount">₱2,850</span><small> · one-time</small></div>
           <div class="p-actions">
             <a class="btn btn-dark btn-sm" href="#payhip-link"><span>Buy Template</span></a>
             <a class="btn btn-gold-line btn-sm" href="#request-setup">Request DFY Setup</a>
@@ -691,9 +737,9 @@
           </div>
           <div class="p-row">
             <span class="p-label">Includes</span>
-            <span class="p-value">All five templates above + master setup guide + structure for connecting them into one workflow</span>
+            <span class="p-value">All six templates above + master setup guide + structure for connecting them into one workflow</span>
           </div>
-          <div class="p-price">₱—<small> · one-time</small></div>
+          <div class="p-price" data-php="₱5,999" data-usd="$103"><span class="price-amount">₱5,999</span><small> · one-time</small></div>
           <div class="p-actions">
             <a class="btn btn-dark btn-sm" href="#payhip-link"><span>Buy Template</span></a>
             <a class="btn btn-gold-line btn-sm" href="#request-setup">Request DFY Setup</a>
@@ -725,7 +771,7 @@
             <span class="p-label">Includes</span>
             <span class="p-value">Template installation, your branding applied, basic configuration, plain-language walkthrough, handover</span>
           </div>
-          <div class="p-price">₱—<small> · one-time</small></div>
+          <div class="p-price" data-php="₱8,000" data-usd="$138"><span class="price-amount">₱8,000</span><small> · one-time</small></div>
           <div class="p-actions">
             <a class="btn btn-dark btn-sm" href="#request-setup"><span>Request Starter Setup</span></a>
           </div>
@@ -741,7 +787,7 @@
             <span class="p-label">Includes</span>
             <span class="p-value">Multiple templates installed & connected, data flowing between them, your branding, training + handover</span>
           </div>
-          <div class="p-price">₱—<small> · one-time</small></div>
+          <div class="p-price" data-php="₱18,000" data-usd="$310"><span class="price-amount">₱18,000</span><small> · one-time</small></div>
           <div class="p-actions">
             <a class="btn btn-dark btn-sm" href="#request-setup"><span>Request Business Flow</span></a>
           </div>
@@ -757,7 +803,7 @@
             <span class="p-label">Includes</span>
             <span class="p-value">Automated workflows built around your process, integrations connected, tested live, training + handover + support window</span>
           </div>
-          <div class="p-price">₱—<small> · one-time</small></div>
+          <div class="p-price" data-php="₱28,000" data-usd="$483"><span class="price-amount">₱28,000</span><small> · one-time</small></div>
           <div class="p-actions">
             <a class="btn btn-dark btn-sm" href="#request-setup"><span>Request Automation Setup</span></a>
           </div>
@@ -774,7 +820,7 @@
             <span class="p-label">Includes</span>
             <span class="p-value">Scope call, custom system design & build, everything connected, plain-language training, handover + support window</span>
           </div>
-          <div class="p-price">₱—<small> · quoted after scope call</small></div>
+          <div class="p-price">Custom<small> · quoted after scope call</small></div>
           <div class="p-actions">
             <a class="btn btn-dark btn-sm" href="#request-setup"><span>Request Custom Build</span></a>
           </div>
@@ -811,15 +857,23 @@
           <div class="sub-tagline">Keep it healthy</div>
           <div class="p-row">
             <span class="p-label">Best For</span>
-            <span class="p-value dark">Owners who want their system maintained and dependable</span>
+            <span class="p-value dark">Stable systems needing occasional fixes</span>
           </div>
           <ul>
-            <li>System health checks</li>
-            <li>Bug fixes & small corrections</li>
-            <li>Priority email support</li>
-            <li>Monthly status summary</li>
+            <li>Monthly system health checks</li>
+            <li>Unlimited bug fixes</li>
+            <li>24-48 hr email support</li>
+            <li>Monthly status report</li>
           </ul>
-          <div class="p-price">₱—<small> / month</small></div>
+          <details class="sub-details" style="margin-top:10px;">
+            <summary style="cursor:pointer; font-size:11px; color:var(--gold-deep); font-weight:600; letter-spacing:1px;">+ View all inclusions</summary>
+            <div style="margin-top:8px; font-size:12px; color:var(--muted); line-height:1.6;">
+              • Updates to integrations (Airtable, n8n, etc.)
+              • Improvement recommendations
+              • Month-to-month or save with longer commitment
+            </div>
+          </details>
+          <div class="p-price" data-php="₱5,000" data-usd="$86"><span class="price-amount">₱5,000</span><small> / month</small></div>
           <div class="p-actions">
             <a class="btn btn-outline btn-sm" href="#subscribe">Start Care Plan</a>
           </div>
@@ -831,15 +885,25 @@
           <div class="sub-tagline">Keep it improving</div>
           <div class="p-row">
             <span class="p-label">Best For</span>
-            <span class="p-value dark">Businesses that want the system to evolve with them</span>
+            <span class="p-value dark">Growing businesses wanting active system improvements</span>
           </div>
           <ul>
-            <li>Everything in Care Plan</li>
-            <li>Monthly improvements & tweaks</li>
-            <li>New automation added over time</li>
-            <li>Workflow reviews & suggestions</li>
+            <li>Everything in Care Plan +</li>
+            <li>4-6 hrs/month active work</li>
+            <li>Monthly new automations</li>
+            <li>1 working session/month</li>
           </ul>
-          <div class="p-price">₱—<small> / month</small></div>
+          <details class="sub-details" style="margin-top:10px;">
+            <summary style="cursor:pointer; font-size:11px; color:var(--gold-deep); font-weight:600; letter-spacing:1px;">+ View all inclusions</summary>
+            <div style="margin-top:8px; font-size:12px; color:var(--muted); line-height:1.6;">
+              • Quarterly system audits
+              • Pro-active optimization
+              • New integrations & setup
+              • Team training on updates
+              • 12-24 hr response time
+            </div>
+          </details>
+          <div class="p-price" data-php="₱12,000" data-usd="$207"><span class="price-amount">₱12,000</span><small> / month</small></div>
           <div class="p-actions">
             <a class="btn btn-dark btn-sm" href="#subscribe"><span>Start Growth Plan</span></a>
           </div>
@@ -847,18 +911,29 @@
 
         <div class="sub-card">
           <h3>Operator Plan</h3>
-          <div class="sub-tagline">We run it with you</div>
+          <div class="sub-tagline">We run it for you</div>
           <div class="p-row">
             <span class="p-label">Best For</span>
-            <span class="p-value dark">Owners who want hands-on operational support every month</span>
+            <span class="p-value dark">Founders who want automation as a strategic advantage</span>
           </div>
           <ul>
-            <li>Everything in Growth Plan</li>
-            <li>Hands-on operations support</li>
-            <li>Regular working sessions</li>
-            <li>First priority on requests</li>
+            <li>Everything in Growth Plan +</li>
+            <li>8-10 hrs/month hands-on ops</li>
+            <li>Bi-weekly working sessions</li>
+            <li>Same-day response on urgent</li>
           </ul>
-          <div class="p-price">₱—<small> / month</small></div>
+          <details class="sub-details" style="margin-top:10px;">
+            <summary style="cursor:pointer; font-size:11px; color:var(--gold-deep); font-weight:600; letter-spacing:1px;">+ View all inclusions</summary>
+            <div style="margin-top:8px; font-size:12px; color:var(--muted); line-height:1.6;">
+              • Proactive issue monitoring
+              • Quarterly strategic reviews
+              • Unlimited scope changes
+              • Direct chat access (24/7)
+              • Custom reporting dashboard
+              • 3-month minimum • Limited to 2-3 clients
+            </div>
+          </details>
+          <div class="p-price" data-php="₱20,000" data-usd="$345"><span class="price-amount">₱20,000</span><small> / month</small></div>
           <div class="p-actions">
             <a class="btn btn-outline btn-sm" href="#subscribe">Start Operator Plan</a>
           </div>
@@ -1103,6 +1178,33 @@ document.querySelectorAll('a[href="#request-setup"]').forEach(function (link) {
   if (toggle && nav) {
     toggle.addEventListener('click', function () { nav.classList.toggle('open'); });
   }
+})();
+
+/* ══════════ Currency switch ══════════ */
+(function () {
+  var KEY = 'am777_currency';
+  var buttons = document.querySelectorAll('.curr-btn');
+  if (!buttons.length) return;
+
+  function apply(curr) {
+    document.querySelectorAll('.p-price[data-php][data-usd]').forEach(function (el) {
+      var span = el.querySelector('.price-amount');
+      if (!span) return;
+      span.textContent = curr === 'usd' ? el.getAttribute('data-usd') : el.getAttribute('data-php');
+    });
+    buttons.forEach(function (b) {
+      b.classList.toggle('active', b.getAttribute('data-currency') === curr);
+    });
+    try { localStorage.setItem(KEY, curr); } catch (e) { /* storage unavailable */ }
+  }
+
+  buttons.forEach(function (b) {
+    b.addEventListener('click', function () { apply(b.getAttribute('data-currency')); });
+  });
+
+  var saved = 'php';
+  try { saved = localStorage.getItem(KEY) || 'php'; } catch (e) { /* storage unavailable */ }
+  apply(saved);
 })();
 
 /* ══════════ Scroll reveal (Framer-light) ══════════ */

@@ -1414,6 +1414,54 @@ function am777FormPlaceholder(e) {
       .catch(function () { console.log('AM777: webhook unreachable, lead logged locally:', payload); });
   }
 })();
+
+// Lead Form Modal Logic
+var pendingSetupTier = null;
+
+function openLeadFormModal(tier) {
+  pendingSetupTier = tier;
+  document.getElementById('lead-form-modal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLeadFormModal() {
+  document.getElementById('lead-form-modal').style.display = 'none';
+  document.body.style.overflow = 'auto';
+  pendingSetupTier = null;
+  document.getElementById('quick-lead-form').reset();
+}
+
+function submitLeadForm(e) {
+  e.preventDefault();
+
+  var form = document.getElementById('quick-lead-form');
+  var payload = {
+    name: form.name.value,
+    email: form.email.value,
+    business: form.business.value,
+    problem: form.problem.value,
+    interest: 'DFY Setup - ' + (pendingSetupTier || 'Unspecified'),
+    source: 'am777-dfy-modal',
+    timestamp: new Date().toISOString()
+  };
+
+  // Send to webhook if configured
+  if (AM777_WEBHOOK && AM777_WEBHOOK.indexOf('REPLACE_ME') === -1) {
+    fetch(AM777_WEBHOOK, { method: 'POST', body: JSON.stringify(payload) })
+      .catch(function () { console.log('Lead logged:', payload); });
+  }
+
+  // Show success and proceed
+  closeLeadFormModal();
+  window.location.href = '#request-setup';
+}
+
+// Close modal when clicking outside
+document.getElementById('lead-form-modal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeLeadFormModal();
+  }
+});
 </script>
 
 </body>
